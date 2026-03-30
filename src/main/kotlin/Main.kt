@@ -1,10 +1,16 @@
 package org.example
 
 import java.io.File
+import java.io.FileNotFoundException
 
 fun main() {
-    val wordsFile = File("words.txt")
-    wordsFile.readLines().forEach { line ->
-        println(line)
+    val fileName = "words.txt"
+    val wordsFile = File(fileName)
+    try {
+        wordsFile.readLines().forEach { line ->
+            println(line)
+        }
+    } catch (e: FileNotFoundException) {
+        println("Файл \"$fileName\" не найден")
     }
 }
