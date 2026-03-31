@@ -1,39 +1,36 @@
 package org.example
 
 import java.io.File
+import java.io.FileNotFoundException
 
 fun main() {
-    val wordsFile = File("words.txt")
-//    wordsFile.readLines().forEach { line ->
-//        println(line)
-//    }
-
-
+    val fileName = "words.txt"
+    val wordsFile = File(fileName)
+    var splitLine: List<String>
     val dictionary = mutableListOf<Word>()
 
-    var lineList = mutableListOf<String>()
-
-    for (line in wordsFile.readLines()) {
-
-        lineList = line.split("|") as MutableList<String>
-//        lineList[2] = lineList[2] ?: "0"
-        val lineList2 = lineList[2] ?: "0"
-        dictionary.add(
-            Word(
-                text = lineList[0],
-                translate = lineList[1],
-                correctAnswersCount = (lineList2).toInt(),
+    try {
+        wordsFile.readLines().forEach { line ->
+            splitLine = line.split("|")
+            dictionary.add(
+                Word(
+                    original = splitLine[0],
+                    translate = splitLine[1],
+                    correctAnswersCount = (splitLine.getOrNull(2))?.toIntOrNull() ?: 0,
+                )
             )
-        )
-//        println()
+        }
+    } catch (e: FileNotFoundException) {
+        println("Файл \"$fileName\" не найден")
     }
-    dictionary.forEach {
-        println(it)
+
+    dictionary.forEach { word ->
+        println(word)
     }
 }
 
 data class Word(
-    val text: String,
+    val original: String,
     val translate: String,
-    val correctAnswersCount: Int = 0,
+    val correctAnswersCount: Int,
 )
