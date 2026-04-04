@@ -14,8 +14,32 @@ fun main() {
         println("2 – Статистика")
         println("0 – Выход")
         when (readln()) {
-            "1" -> println("Выбран пункт \"Учить слова\"")
-            "2" -> println("Выбран пункт \"Статистика\"")
+            "1" -> {
+                println("Выбран пункт \"Учить слова\"")
+
+                while (true) {
+                    val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
+                    if (notLearnedList.isNotEmpty()) {
+                        val questionWords = notLearnedList.take(4).shuffled()
+                        println("Выберите правильный перевод для слова \"${questionWords[0].original}\"")
+                        println()
+                        println("${questionWords[0].original}:")
+                        questionWords.forEachIndexed { index, word ->
+                            println("${index + 1} - ${word.translate}")
+                        }
+
+                    } else println("Все слова в словаре выучены")
+                }
+            }
+
+            "2" -> {
+                println("Выбран пункт \"Статистика\"")
+                val totalCount = dictionary.size
+                val learnedCount = dictionary.count { it.correctAnswersCount >= 3 }
+                val percent = learnedCount * 100 / totalCount
+                println("Выучено $learnedCount из $totalCount слов | $percent%")
+            }
+
             "0" -> return
             else -> println("Введите число 1, 2 или 0")
         }
