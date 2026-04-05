@@ -31,15 +31,15 @@ fun main() {
                     } else println("Все слова в словаре выучены")
                 }
             }
-
             "2" -> {
                 println("Выбран пункт \"Статистика\"")
                 val totalCount = dictionary.size
-                val learnedCount = dictionary.count { it.correctAnswersCount >= 3 }
-                val percent = learnedCount * 100 / totalCount
-                println("Выучено $learnedCount из $totalCount слов | $percent%")
+                if (totalCount != 0) {
+                    val learnedCount = dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
+                    val percent = learnedCount * 100 / totalCount
+                    println("Выучено $learnedCount из $totalCount слов | $percent%")
+                } else println("Словарь пустой")
             }
-
             "0" -> return
             else -> println("Введите число 1, 2 или 0")
         }
@@ -75,3 +75,5 @@ data class Word(
     val translate: String,
     val correctAnswersCount: Int,
 )
+
+const val MIN_CORRECT_ANSWERS_COUNT = 3

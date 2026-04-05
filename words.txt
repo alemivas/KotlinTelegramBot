@@ -1,4 +1,6 @@
 hello|привет|0
-dog|собака|
-cat|кошка
-table|стол|dghdf
+dog|собака|5
+cat|кошка|3
+table|стол
+flag|флаг|2
+chair|стул|
