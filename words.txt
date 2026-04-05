@@ -1,6 +1,10 @@
-hello|привет|0
-dog|собака|5
-cat|кошка|3
-table|стол
-flag|флаг|2
-chair|стул|
+one|один|0
+two|два|
+three|три
+four|четыре|3
+five|пять|2
+six|шесть|0
+seven|семь|1
+eight|восемь|2
+nine|девять|0
+ten|десять|10
