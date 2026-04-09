@@ -20,13 +20,17 @@ fun main() {
                     val notLearnedList = dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
                     if (notLearnedList.isNotEmpty()) {
                         val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
+                        val answersVariantsRange = 1..questionWords.size
 //                        val correctAnswer = questionWords[0]
 //                        val correctAnswerId = (0..<ANSWERS_VARIANTS_COUNT).random()
-                        val correctAnswerId = ANSWERS_VARIANTS_RANGE.random() - 1
+//                        val correctAnswerId = ANSWERS_VARIANTS_RANGE.random() - 1
+                        val correctAnswerId = answersVariantsRange.random() - 1
                         println()
 //                        println("${correctAnswer.original}:")
                         println("${questionWords[correctAnswerId].original}:")
 //                        questionWords.shuffled().forEachIndexed { index, word ->
+//                        val shuffledQuestionWords = questionWords.shuffled()
+//                        shuffledQuestionWords.forEachIndexed { index, word ->
 //                            println("${index + 1} - ${word.translate}")
 //                        }
 
@@ -36,6 +40,8 @@ fun main() {
                         println("----------")
                         println("0 - Меню")
                         val userAnswerInput = readln()
+//                        val correctAnswerId = questionWords.indexOf(correctAnswer)
+//                        val correctAnswerId = shuffledQuestionWords.indexOf(correctAnswer)
                         when {
                             userAnswerInput == "0" -> break
 //                            userAnswerInput.toInt() - 1 == correctAnswerId -> println("Правильно!")
@@ -47,18 +53,23 @@ fun main() {
                                 saveDictionary(dictionary)
                             }
 //                            userAnswerInput.toInt() in ANSWERS_VARIANTS_RANGE ->
-                            userAnswerInput.toIntOrNull() in ANSWERS_VARIANTS_RANGE ->
+//                            userAnswerInput.toIntOrNull() in ANSWERS_VARIANTS_RANGE ->
+                            userAnswerInput.toIntOrNull() in answersVariantsRange ->
+//                            userAnswerInput.toIntOrNull() in 1..questionWords.size ->
 //                            null in ANSWERS_VARIANTS_RANGE ->
                                 println(
                                     "Неправильно! ${questionWords[correctAnswerId].original} – " + "это ${questionWords[correctAnswerId].translate}"
                                 )
 //                            else -> println("Введите число $ANSWERS_VARIANTS_RANGE или 0")
-                            else -> println("Введите число ${ANSWERS_VARIANTS_RANGE.toList().joinToString()} или 0")
+//                            else -> println("Введите число ${ANSWERS_VARIANTS_RANGE.toList().joinToString()} или 0")
+                            else -> println("Введите число ${answersVariantsRange.toList().joinToString()} или 0")
+//                            else -> println("Введите число ${(1..questionWords.size).toList().joinToString()} или 0")
                         }
 //                        if (userAnswerInput == "0") break
 //                        if (userAnswerInput.toInt() == correctAnswerId) println("Правильно!")
 
                     } else {
+                        println()
                         println("Все слова в словаре выучены")
                         break
                     }
