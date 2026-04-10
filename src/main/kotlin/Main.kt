@@ -16,30 +16,30 @@ fun main() {
         when (readln()) {
             "1" -> {
                 println("Выбран пункт \"Учить слова\"")
-                println()
                 while (true) {
                     val notLearnedList = dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
                     if (notLearnedList.isNotEmpty()) {
                         val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
                         val answersVariantsRange = 1..questionWords.size
                         val correctAnswerId = answersVariantsRange.random() - 1
+                        println()
                         println("${questionWords[correctAnswerId].original}:")
                         questionWords.forEachIndexed { index, word ->
                             println("${index + 1} - ${word.translate}")
                         }
                         println("----------")
                         println("0 - Меню")
-                        val userAnswerInput = readln()
-                        when {
-                            userAnswerInput == "0" -> break
+                        val userAnswerInput = readln().toIntOrNull()
+                        when (userAnswerInput) {
+                            0 -> break
 
-                            userAnswerInput == (correctAnswerId + 1).toString() -> {
+                            correctAnswerId + 1 -> {
                                 println("Правильно!")
                                 dictionary[dictionary.indexOf(questionWords[correctAnswerId])].correctAnswersCount++
                                 saveDictionary(dictionary)
                             }
 
-                            userAnswerInput.toIntOrNull() in answersVariantsRange -> println(
+                            in answersVariantsRange -> println(
                                 "Неправильно! ${questionWords[correctAnswerId].original} – " +
                                         "это ${questionWords[correctAnswerId].translate}"
                             )
@@ -47,6 +47,7 @@ fun main() {
                             else -> println("Введите число ${answersVariantsRange.toList().joinToString()} или 0")
                         }
                     } else {
+                        println()
                         println("Все слова в словаре выучены")
                         break
                     }
