@@ -16,60 +16,37 @@ fun main() {
         when (readln()) {
             "1" -> {
                 println("Выбран пункт \"Учить слова\"")
+                println()
                 while (true) {
                     val notLearnedList = dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
                     if (notLearnedList.isNotEmpty()) {
                         val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
                         val answersVariantsRange = 1..questionWords.size
-//                        val correctAnswer = questionWords[0]
-//                        val correctAnswerId = (0..<ANSWERS_VARIANTS_COUNT).random()
-//                        val correctAnswerId = ANSWERS_VARIANTS_RANGE.random() - 1
                         val correctAnswerId = answersVariantsRange.random() - 1
-                        println()
-//                        println("${correctAnswer.original}:")
                         println("${questionWords[correctAnswerId].original}:")
-//                        questionWords.shuffled().forEachIndexed { index, word ->
-//                        val shuffledQuestionWords = questionWords.shuffled()
-//                        shuffledQuestionWords.forEachIndexed { index, word ->
-//                            println("${index + 1} - ${word.translate}")
-//                        }
-
                         questionWords.forEachIndexed { index, word ->
                             println("${index + 1} - ${word.translate}")
                         }
                         println("----------")
                         println("0 - Меню")
                         val userAnswerInput = readln()
-//                        val correctAnswerId = questionWords.indexOf(correctAnswer)
-//                        val correctAnswerId = shuffledQuestionWords.indexOf(correctAnswer)
                         when {
                             userAnswerInput == "0" -> break
-//                            userAnswerInput.toInt() - 1 == correctAnswerId -> println("Правильно!")
-//                            userAnswerInput.toIntOrNull()?.minus(1) == correctAnswerId -> println("Правильно!")
+
                             userAnswerInput == (correctAnswerId + 1).toString() -> {
                                 println("Правильно!")
-//                                questionWords[correctAnswerId].correctAnswersCount++
                                 dictionary[dictionary.indexOf(questionWords[correctAnswerId])].correctAnswersCount++
                                 saveDictionary(dictionary)
                             }
-//                            userAnswerInput.toInt() in ANSWERS_VARIANTS_RANGE ->
-//                            userAnswerInput.toIntOrNull() in ANSWERS_VARIANTS_RANGE ->
-                            userAnswerInput.toIntOrNull() in answersVariantsRange ->
-//                            userAnswerInput.toIntOrNull() in 1..questionWords.size ->
-//                            null in ANSWERS_VARIANTS_RANGE ->
-                                println(
-                                    "Неправильно! ${questionWords[correctAnswerId].original} – " + "это ${questionWords[correctAnswerId].translate}"
-                                )
-//                            else -> println("Введите число $ANSWERS_VARIANTS_RANGE или 0")
-//                            else -> println("Введите число ${ANSWERS_VARIANTS_RANGE.toList().joinToString()} или 0")
-                            else -> println("Введите число ${answersVariantsRange.toList().joinToString()} или 0")
-//                            else -> println("Введите число ${(1..questionWords.size).toList().joinToString()} или 0")
-                        }
-//                        if (userAnswerInput == "0") break
-//                        if (userAnswerInput.toInt() == correctAnswerId) println("Правильно!")
 
+                            userAnswerInput.toIntOrNull() in answersVariantsRange -> println(
+                                "Неправильно! ${questionWords[correctAnswerId].original} – " +
+                                        "это ${questionWords[correctAnswerId].translate}"
+                            )
+
+                            else -> println("Введите число ${answersVariantsRange.toList().joinToString()} или 0")
+                        }
                     } else {
-                        println()
                         println("Все слова в словаре выучены")
                         break
                     }
@@ -87,14 +64,13 @@ fun main() {
             }
 
             "0" -> return
+
             else -> println("Введите число 1, 2 или 0")
         }
     }
 }
 
 fun loadDictionary(): MutableList<Word> {
-    val fileName = "words.txt"
-    val wordsFile = File(fileName)
     var splitLine: List<String>
     val dictionary = mutableListOf<Word>()
 
@@ -110,16 +86,13 @@ fun loadDictionary(): MutableList<Word> {
             )
         }
     } catch (e: FileNotFoundException) {
-        println("Файл \"$fileName\" не найден")
+        println("Файл \"$FILE_NAME\" не найден")
     }
 
     return dictionary
 }
 
 fun saveDictionary(dictionary: MutableList<Word>) {
-    val fileName = "TEMPwords.txt"
-    val wordsFile = File(fileName)
-//    wordsFile.clear()
     wordsFile.writeText("")
     dictionary.forEach { word ->
         wordsFile.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
@@ -134,4 +107,5 @@ data class Word(
 
 const val MIN_CORRECT_ANSWERS_COUNT = 3
 const val ANSWERS_VARIANTS_COUNT = 4
-val ANSWERS_VARIANTS_RANGE = 1..ANSWERS_VARIANTS_COUNT
+const val FILE_NAME = "words.txt"
+val wordsFile = File(FILE_NAME)
