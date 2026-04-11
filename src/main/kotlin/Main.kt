@@ -20,19 +20,40 @@ fun main() {
                     val notLearnedList = dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
                     if (notLearnedList.isNotEmpty()) {
                         val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
-                        val correctAnswer = questionWords[0]
+                        val answersVariantsRange = 1..questionWords.size
+                        val correctAnswerId = answersVariantsRange.random() - 1
                         println()
-                        println("${correctAnswer.original}:")
-                        questionWords.shuffled().forEachIndexed { index, word ->
+                        println("${questionWords[correctAnswerId].original}:")
+                        questionWords.forEachIndexed { index, word ->
                             println("${index + 1} - ${word.translate}")
                         }
-                        readln()
+                        println("----------")
+                        println("0 - Меню")
+                        val userAnswerInput = readln().toIntOrNull()
+                        when (userAnswerInput) {
+                            0 -> break
+
+                            correctAnswerId + 1 -> {
+                                println("Правильно!")
+                                dictionary[dictionary.indexOf(questionWords[correctAnswerId])].correctAnswersCount++
+                                saveDictionary(dictionary)
+                            }
+
+                            in answersVariantsRange -> println(
+                                "Неправильно! ${questionWords[correctAnswerId].original} – " +
+                                        "это ${questionWords[correctAnswerId].translate}"
+                            )
+
+                            else -> println("Введите число ${answersVariantsRange.toList().joinToString()} или 0")
+                        }
                     } else {
+                        println()
                         println("Все слова в словаре выучены")
                         break
                     }
                 }
             }
+
             "2" -> {
                 println("Выбран пункт \"Статистика\"")
                 val totalCount = dictionary.size
@@ -42,15 +63,15 @@ fun main() {
                     println("Выучено $learnedCount из $totalCount слов | $percent%")
                 } else println("Словарь пустой")
             }
+
             "0" -> return
+
             else -> println("Введите число 1, 2 или 0")
         }
     }
 }
 
 fun loadDictionary(): MutableList<Word> {
-    val fileName = "words.txt"
-    val wordsFile = File(fileName)
     var splitLine: List<String>
     val dictionary = mutableListOf<Word>()
 
@@ -66,17 +87,26 @@ fun loadDictionary(): MutableList<Word> {
             )
         }
     } catch (e: FileNotFoundException) {
-        println("Файл \"$fileName\" не найден")
+        println("Файл \"$FILE_NAME\" не найден")
     }
 
     return dictionary
 }
 
+fun saveDictionary(dictionary: MutableList<Word>) {
+    wordsFile.writeText("")
+    dictionary.forEach { word ->
+        wordsFile.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
+    }
+}
+
 data class Word(
     val original: String,
     val translate: String,
-    val correctAnswersCount: Int,
+    var correctAnswersCount: Int,
 )
 
 const val MIN_CORRECT_ANSWERS_COUNT = 3
 const val ANSWERS_VARIANTS_COUNT = 4
+const val FILE_NAME = "words.txt"
+val wordsFile = File(FILE_NAME)
