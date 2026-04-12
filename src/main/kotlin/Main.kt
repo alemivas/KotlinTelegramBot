@@ -1,11 +1,11 @@
 package org.example
 
 import java.io.File
-import java.io.FileNotFoundException
 
 fun main() {
     println("=== Тренажер английских слов ===")
-    val dictionary = loadDictionary()
+
+    val trainer = LearnWordsTrainer()
 
     while (true) {
         println()
@@ -17,7 +17,8 @@ fun main() {
             "1" -> {
                 println("Выбран пункт \"Учить слова\"")
                 while (true) {
-                    val notLearnedList = dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
+                    val notLearnedList =
+                        trainer.dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
                     if (notLearnedList.isNotEmpty()) {
                         val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
                         val answersVariantsRange = 1..questionWords.size
@@ -35,8 +36,9 @@ fun main() {
 
                             correctAnswerId + 1 -> {
                                 println("Правильно!")
-                                dictionary[dictionary.indexOf(questionWords[correctAnswerId])].correctAnswersCount++
-                                saveDictionary(dictionary)
+//                                dictionary[dictionary.indexOf(questionWords[correctAnswerId])].correctAnswersCount++
+                                questionWords[correctAnswerId].correctAnswersCount++
+                                trainer.saveDictionary(trainer.dictionary)
                             }
 
                             in answersVariantsRange -> println(
@@ -56,11 +58,15 @@ fun main() {
 
             "2" -> {
                 println("Выбран пункт \"Статистика\"")
-                val totalCount = dictionary.size
-                if (totalCount != 0) {
-                    val learnedCount = dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
-                    val percent = learnedCount * 100 / totalCount
-                    println("Выучено $learnedCount из $totalCount слов | $percent%")
+
+                val statistics = trainer.getStatistics()
+
+//                val totalCount = trainer.dictionary.size
+//                if (totalCount != 0) {
+                if (statistics.totalCount != 0) {
+//                    val learnedCount = trainer.dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
+//                    val percent = learnedCount * 100 / totalCount
+                    println("Выучено ${statistics.learnedCount} из ${statistics.totalCount} слов | ${statistics.percent}%")
                 } else println("Словарь пустой")
             }
 
@@ -68,35 +74,6 @@ fun main() {
 
             else -> println("Введите число 1, 2 или 0")
         }
-    }
-}
-
-fun loadDictionary(): MutableList<Word> {
-    var splitLine: List<String>
-    val dictionary = mutableListOf<Word>()
-
-    try {
-        wordsFile.readLines().forEach { line ->
-            splitLine = line.split("|")
-            dictionary.add(
-                Word(
-                    original = splitLine[0],
-                    translate = splitLine[1],
-                    correctAnswersCount = (splitLine.getOrNull(2))?.toIntOrNull() ?: 0,
-                )
-            )
-        }
-    } catch (e: FileNotFoundException) {
-        println("Файл \"$FILE_NAME\" не найден")
-    }
-
-    return dictionary
-}
-
-fun saveDictionary(dictionary: MutableList<Word>) {
-    wordsFile.writeText("")
-    dictionary.forEach { word ->
-        wordsFile.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
     }
 }
 
