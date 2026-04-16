@@ -4,14 +4,17 @@ import java.io.FileNotFoundException
 
 data class Statistics(
     val totalCount: Int,
-//    if (totalCount != 0) {
-    val learnedCount: Int/* = 0*/,
-    val percent: Int/* = 0*/,
+    val learnedCount: Int,
+    val percent: Int,
 )
 
+data class Question(
+    val variants: List<Word>,
+    val correctAnswerId: Int,
+)
 
 class LearnWordsTrainer {
-
+    private var question: Question? = null
     val dictionary = loadDictionary()
 
     fun loadDictionary(): MutableList<Word> {
@@ -44,32 +47,47 @@ class LearnWordsTrainer {
     }
 
     fun getStatistics(): Statistics {
-
         val totalCount = dictionary.size
-//        if (totalCount != 0) {
-//            val learnedCount = dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
-//            val percent = learnedCount * 100 / totalCount
-//        } else {
-//            val learnedCount = 0
-//            val percent = 0
-//        }
         val learnedCount =
             if (totalCount != 0) dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
             else 0
         val percent =
             if (totalCount != 0) learnedCount * 100 / totalCount
             else 0
+        return Statistics(totalCount, learnedCount, percent)
+    }
+
+    fun getNextQuestion(): Question? {
 
 
-//        val learnedCount = 0
-        return Statistics(totalCount, learnedCount, percent,
-//            totalCount = dictionary.size,
-//            learnedCount = if (totalCount != 0) dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size else 0,
-//            percent = if (totalCount != 0) learnedCount * 100 / totalCount else 0,
+        val notLearnedList =
+//            trainer.dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
+            dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
+        if (notLearnedList.isEmpty()) return null
 
-//                if (totalCount != 0) {
-//                    val learnedCount = dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
-//                    val percent = learnedCount * 100 / totalCount
+        val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
+//        val answersVariantsRange = 1..question.variants.size
+        val answersVariantsRange = 1..questionWords.size
+        val correctAnswerId = answersVariantsRange.random() - 1
+
+        question = Question(
+//            variants = notLearnedList,
+            variants = questionWords,
+            correctAnswerId = correctAnswerId,
         )
+        return question
+    }
+
+    fun checkAnswer(userAnswerIndex: Int?): Boolean {
+        return question?.let {
+//            if (question == null) return false
+            if (userAnswerIndex == it.correctAnswerId) {
+                it.variants[it.correctAnswerId].correctAnswersCount++
+                saveDictionary(dictionary)
+                true
+            } else
+                false
+        } ?: false
+
     }
 }
