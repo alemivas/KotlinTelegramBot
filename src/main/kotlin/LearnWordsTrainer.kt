@@ -1,6 +1,12 @@
 package org.example
 
+import java.io.File
 import java.io.FileNotFoundException
+
+const val MIN_CORRECT_ANSWERS_COUNT = 3
+const val ANSWERS_VARIANTS_COUNT = 4
+const val FILE_NAME = "words.txt"
+val wordsFile = File(FILE_NAME)
 
 data class Statistics(
     val totalCount: Int,
@@ -11,13 +17,51 @@ data class Statistics(
 data class Question(
     val variants: List<Word>,
     val correctAnswerId: Int,
+    val variantsRange: IntRange,
 )
 
 class LearnWordsTrainer {
     private var question: Question? = null
-    val dictionary = loadDictionary()
+    private val dictionary = loadDictionary()
 
-    fun loadDictionary(): MutableList<Word> {
+    fun getStatistics(): Statistics {
+        val totalCount = dictionary.size
+        val learnedCount =
+            if (totalCount != 0) dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
+            else 0
+        val percent =
+            if (totalCount != 0) learnedCount * 100 / totalCount
+            else 0
+        return Statistics(totalCount, learnedCount, percent)
+    }
+
+    fun getNextQuestion(): Question? {
+        val notLearnedList =
+            dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
+        if (notLearnedList.isEmpty()) return null
+        val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
+        val answersVariantsRange = 1..questionWords.size
+        val correctAnswerId = answersVariantsRange.random() - 1
+        question = Question(
+            variants = questionWords,
+            correctAnswerId = correctAnswerId,
+            variantsRange = answersVariantsRange,
+        )
+        return question
+    }
+
+    fun checkAnswer(userAnswerIndex: Int?): Boolean {
+        return question?.let {
+            if (userAnswerIndex == it.correctAnswerId) {
+                it.variants[it.correctAnswerId].correctAnswersCount++
+                saveDictionary(dictionary)
+                true
+            } else
+                false
+        } ?: false
+    }
+
+    private fun loadDictionary(): MutableList<Word> {
         var splitLine: List<String>
         val dictionary = mutableListOf<Word>()
 
@@ -39,55 +83,10 @@ class LearnWordsTrainer {
         return dictionary
     }
 
-    fun saveDictionary(dictionary: MutableList<Word>) {
+    private fun saveDictionary(dictionary: MutableList<Word>) {
         wordsFile.writeText("")
         dictionary.forEach { word ->
             wordsFile.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
         }
-    }
-
-    fun getStatistics(): Statistics {
-        val totalCount = dictionary.size
-        val learnedCount =
-            if (totalCount != 0) dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
-            else 0
-        val percent =
-            if (totalCount != 0) learnedCount * 100 / totalCount
-            else 0
-        return Statistics(totalCount, learnedCount, percent)
-    }
-
-    fun getNextQuestion(): Question? {
-
-
-        val notLearnedList =
-//            trainer.dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
-            dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
-        if (notLearnedList.isEmpty()) return null
-
-        val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
-//        val answersVariantsRange = 1..question.variants.size
-        val answersVariantsRange = 1..questionWords.size
-        val correctAnswerId = answersVariantsRange.random() - 1
-
-        question = Question(
-//            variants = notLearnedList,
-            variants = questionWords,
-            correctAnswerId = correctAnswerId,
-        )
-        return question
-    }
-
-    fun checkAnswer(userAnswerIndex: Int?): Boolean {
-        return question?.let {
-//            if (question == null) return false
-            if (userAnswerIndex == it.correctAnswerId) {
-                it.variants[it.correctAnswerId].correctAnswersCount++
-                saveDictionary(dictionary)
-                true
-            } else
-                false
-        } ?: false
-
     }
 }
