@@ -2,7 +2,7 @@ one|один|0
 two|два|0
 three|три|0
 four|четыре|3
-five|пять|2
+five|пять|3
 six|шесть|1
 seven|семь|1
 eight|восемь|3

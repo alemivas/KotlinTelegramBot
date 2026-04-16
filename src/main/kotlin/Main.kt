@@ -12,7 +12,7 @@ fun Question.asConsoleString(): String {
         .joinToString("\n")
     return variants[correctAnswerId].original + ":\n" +
             answerVariants + ":\n" +
-            "----------" +
+            "----------\n" +
             "0 - Меню"
 }
 
