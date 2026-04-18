@@ -19,12 +19,13 @@ fun Question.asConsoleString(): String {
 fun main() {
     println("=== Тренажер английских слов ===")
     val trainer = try {
-        /*val trainer = */LearnWordsTrainer(
+        LearnWordsTrainer(
             minCorrectAnswersCount = 3,
             answersVariantsCount = 4,
         )
     } catch (e: Exception) {
-        println("Ошибка чтения файла")
+        println()
+        println("Невозможно загрузить словарь")
         return
     }
 

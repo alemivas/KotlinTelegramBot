@@ -2,11 +2,6 @@ package org.example
 
 import java.io.File
 
-//const val minCorrectAnswersCount = 3
-//const val answersVariantsCount = 4
-//const val FILE_NAME = "words.txt"
-//val wordsFile = File(FILE_NAME)
-
 data class Statistics(
     val totalCount: Int,
     val learnedCount: Int,
@@ -42,23 +37,15 @@ class LearnWordsTrainer(
         val notLearnedList =
             dictionary.filter { it.correctAnswersCount < minCorrectAnswersCount }
         if (notLearnedList.isEmpty()) return null
-
-        val learnedList =
-            dictionary.filter { it.correctAnswersCount >= minCorrectAnswersCount }
-
-        val addedLearnedCount =
-            if (notLearnedList.size > answersVariantsCount) 0
-            else answersVariantsCount - notLearnedList.size
-
-//        val addedLearnedList = learnedList.shuffled().take(answersVariantsCount - notLearnedList.size)
-        val addedLearnedList = learnedList.shuffled().take(addedLearnedCount)
-//        val addedLearnedList = learnedList.shuffled().take(-3)
-//        val addedLearnedList = learnedList.shuffled().take(-3)
-
-//        val questionWords = notLearnedList.shuffled().take(answersVariantsCount)
-        val questionWords = (notLearnedList + addedLearnedList).shuffled().take(answersVariantsCount)
-
-
+        val questionWords =
+            if (notLearnedList.size > answersVariantsCount) {
+                notLearnedList.shuffled().take(answersVariantsCount)
+            } else {
+                val learnedList =
+                    dictionary.filter { it.correctAnswersCount >= minCorrectAnswersCount }
+                val addedLearnedList = learnedList.shuffled().take(answersVariantsCount - notLearnedList.size)
+                (notLearnedList + addedLearnedList).shuffled().take(answersVariantsCount)
+            }
         val answersVariantsRange = 1..questionWords.size
         val correctAnswerId = answersVariantsRange.random() - 1
         question = Question(
@@ -83,8 +70,6 @@ class LearnWordsTrainer(
     private fun loadDictionary(): MutableList<Word> {
         var splitLine: List<String>
         val dictionary = mutableListOf<Word>()
-
-//        try {
         wordsFile.readLines().forEach { line ->
             splitLine = line.split("|")
             dictionary.add(
@@ -95,14 +80,6 @@ class LearnWordsTrainer(
                 )
             )
         }
-//        } catch (e: FileNotFoundException) {
-////            println("Файл \"$FILE_NAME\" не найден")
-//            println("Файл не найден")
-//        } /*catch (e: IndexOutOfBoundsException) {
-//            println("Файл \"$FILE_NAME\" не найден")
-//            throw IllegalStateException("некор файлЁ")
-//        }
-
         return dictionary
     }
 
