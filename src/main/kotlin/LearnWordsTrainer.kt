@@ -1,12 +1,6 @@
 package org.example
 
 import java.io.File
-import java.io.FileNotFoundException
-
-const val MIN_CORRECT_ANSWERS_COUNT = 3
-const val ANSWERS_VARIANTS_COUNT = 4
-const val FILE_NAME = "words.txt"
-val wordsFile = File(FILE_NAME)
 
 data class Statistics(
     val totalCount: Int,
@@ -20,14 +14,18 @@ data class Question(
     val variantsRange: IntRange,
 )
 
-class LearnWordsTrainer {
+class LearnWordsTrainer(
+    private val minCorrectAnswersCount: Int = 3,
+    private val answersVariantsCount: Int = 4
+) {
+    private val wordsFile = File("words.txt")
     private var question: Question? = null
     private val dictionary = loadDictionary()
 
     fun getStatistics(): Statistics {
         val totalCount = dictionary.size
         val learnedCount =
-            if (totalCount != 0) dictionary.filter { it.correctAnswersCount >= MIN_CORRECT_ANSWERS_COUNT }.size
+            if (totalCount != 0) dictionary.filter { it.correctAnswersCount >= minCorrectAnswersCount }.size
             else 0
         val percent =
             if (totalCount != 0) learnedCount * 100 / totalCount
@@ -37,9 +35,17 @@ class LearnWordsTrainer {
 
     fun getNextQuestion(): Question? {
         val notLearnedList =
-            dictionary.filter { it.correctAnswersCount < MIN_CORRECT_ANSWERS_COUNT }
+            dictionary.filter { it.correctAnswersCount < minCorrectAnswersCount }
         if (notLearnedList.isEmpty()) return null
-        val questionWords = notLearnedList.shuffled().take(ANSWERS_VARIANTS_COUNT)
+        val questionWords =
+            if (notLearnedList.size > answersVariantsCount) {
+                notLearnedList.shuffled().take(answersVariantsCount)
+            } else {
+                val learnedList =
+                    dictionary.filter { it.correctAnswersCount >= minCorrectAnswersCount }
+                val addedLearnedList = learnedList.shuffled().take(answersVariantsCount - notLearnedList.size)
+                (notLearnedList + addedLearnedList).shuffled().take(answersVariantsCount)
+            }
         val answersVariantsRange = 1..questionWords.size
         val correctAnswerId = answersVariantsRange.random() - 1
         question = Question(
@@ -64,22 +70,16 @@ class LearnWordsTrainer {
     private fun loadDictionary(): MutableList<Word> {
         var splitLine: List<String>
         val dictionary = mutableListOf<Word>()
-
-        try {
-            wordsFile.readLines().forEach { line ->
-                splitLine = line.split("|")
-                dictionary.add(
-                    Word(
-                        original = splitLine[0],
-                        translate = splitLine[1],
-                        correctAnswersCount = (splitLine.getOrNull(2))?.toIntOrNull() ?: 0,
-                    )
+        wordsFile.readLines().forEach { line ->
+            splitLine = line.split("|")
+            dictionary.add(
+                Word(
+                    original = splitLine[0],
+                    translate = splitLine[1],
+                    correctAnswersCount = (splitLine.getOrNull(2))?.toIntOrNull() ?: 0,
                 )
-            }
-        } catch (e: FileNotFoundException) {
-            println("Файл \"$FILE_NAME\" не найден")
+            )
         }
-
         return dictionary
     }
 

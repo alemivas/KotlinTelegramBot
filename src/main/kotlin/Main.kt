@@ -11,14 +11,23 @@ fun Question.asConsoleString(): String {
         .mapIndexed { index: Int, word: Word -> "${index + 1} - ${word.translate}" }
         .joinToString("\n")
     return variants[correctAnswerId].original + ":\n" +
-            answerVariants + ":\n" +
+            answerVariants + "\n" +
             "----------\n" +
             "0 - Меню"
 }
 
 fun main() {
     println("=== Тренажер английских слов ===")
-    val trainer = LearnWordsTrainer()
+    val trainer = try {
+        LearnWordsTrainer(
+            minCorrectAnswersCount = 3,
+            answersVariantsCount = 4,
+        )
+    } catch (e: Exception) {
+        println()
+        println("Невозможно загрузить словарь")
+        return
+    }
 
     while (true) {
         println()
