@@ -17,6 +17,12 @@ fun main(args: Array<String>) {
         if (startUpdateId == -1 || endUpdateId == -1) continue
         val updateIdString = updates.substring(startUpdateId + 11, endUpdateId)
         updateId = updateIdString.toInt() + 1
+
+        val messageTestRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
+        val matchResult: MatchResult? = messageTestRegex.find(updates)
+        val groups = matchResult?.groups
+        val text = groups?.get(1)?.value
+        println(text)
     }
 }
 
