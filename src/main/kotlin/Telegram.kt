@@ -4,12 +4,12 @@ fun main(args: Array<String>) {
     val updateIdRegex: Regex = "\"update_id\":([0-9]+?),\\s\"message\"".toRegex()
     val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
     val chatIdRegex: Regex = "\"chat\":\\{\"id\":([0-9]+?),\"first_name\"".toRegex()
-    val tgBotService = TelegramBotService()
+    val tgBotService = TelegramBotService(botToken)
     val helloText = "Hello"
 
     while (true) {
         Thread.sleep(2000)
-        val updates: String = tgBotService.getUpdates(botToken, updateId)
+        val updates: String = tgBotService.getUpdates(updateId)
         println(updates)
 
         val updateIdMatchResult: MatchResult? = updateIdRegex.findAll(updates).lastOrNull()
@@ -26,6 +26,6 @@ fun main(args: Array<String>) {
         val chatIdGroups = chatIdMatchResult?.groups
         val chatId = chatIdGroups?.get(1)?.value?.toIntOrNull()
         if (text.equals(helloText, ignoreCase = true) && chatId != null)
-            println(tgBotService.sendMessage(botToken, chatId, helloText))
+            println(tgBotService.sendMessage(chatId, helloText))
     }
 }

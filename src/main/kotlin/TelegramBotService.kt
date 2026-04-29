@@ -3,9 +3,12 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class TelegramBotService {
-    fun getUpdates(botToken: String, updateId: Int): String {
-        val baseURL = "https://api.telegram.org/bot$botToken/"
+class TelegramBotService(
+    botToken: String
+) {
+    private val baseURL = "https://api.telegram.org/bot$botToken/"
+
+    fun getUpdates(updateId: Int): String {
         val urlGetUpdates = "${baseURL}getUpdates?offset=$updateId"
         val client: HttpClient = HttpClient.newBuilder().build()
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
@@ -14,8 +17,7 @@ class TelegramBotService {
         return response.body()
     }
 
-    fun sendMessage(botToken: String, chatId: Int, message: String): String {
-        val baseURL = "https://api.telegram.org/bot$botToken/"
+    fun sendMessage(chatId: Int, message: String): String {
         val urlSendMessage = "${baseURL}sendMessage?chat_id=$chatId&text=$message"
         val client: HttpClient = HttpClient.newBuilder().build()
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage)).build()
