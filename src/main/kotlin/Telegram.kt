@@ -1,9 +1,10 @@
 fun main(args: Array<String>) {
     val botToken = args[0]
     var updateId = 0
-    val updateIdRegex: Regex = "\"update_id\":([0-9]+?),\\s\"message\"".toRegex()
+    val updateIdRegex: Regex = "\"update_id\":([0-9]+?),".toRegex()
     val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
-    val chatIdRegex: Regex = "\"chat\":\\{\"id\":([0-9]+?),\"first_name\"".toRegex()
+    val chatIdRegex: Regex = "\"chat\":\\{\"id\":([0-9]+?),".toRegex()
+    val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
     val tgBotService = TelegramBotService(botToken)
     val helloText = "Hello"
 
@@ -25,7 +26,19 @@ fun main(args: Array<String>) {
         val chatIdMatchResult: MatchResult? = chatIdRegex.find(updates)
         val chatIdGroups = chatIdMatchResult?.groups
         val chatId = chatIdGroups?.get(1)?.value?.toIntOrNull()
+
+        val data = dataRegex.find(updates)?.groups?.get(1)?.value
+
         if (text.equals(helloText, ignoreCase = true) && chatId != null)
             println(tgBotService.sendMessage(chatId, helloText))
+        if (text.equals("menu", ignoreCase = true) && chatId != null)
+            println(tgBotService.sendMenu(chatId))
+        if (data.equals("learn_words_clicked", ignoreCase = true) && chatId != null)
+            println(tgBotService.sendMessage(chatId, "learn_words_clicked"))
+
+//        val dataMatchResult: MatchResult? = dataRegex.find(updates)
+//        val messageGroups = messageMatchResult?.groups
+//        val data = dataRegex.find(updates)?.groups?.get(1)?.value
+
     }
 }
