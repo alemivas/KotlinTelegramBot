@@ -28,7 +28,7 @@ class TelegramBotService(
     }
 
     fun sendMenu(chatId: Int): String {
-//        val encodedMessage = URLEncoder.encode(message, "UTF-8")
+        val urlSendMessage = "${baseURL}sendMessage"
         val sendMenuBody = """
             {
                 "chat_id": $chatId,
@@ -49,7 +49,6 @@ class TelegramBotService(
                 }
             }
         """.trimIndent()
-        val urlSendMessage = "${baseURL}sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(sendMenuBody))
