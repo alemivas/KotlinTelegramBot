@@ -32,9 +32,15 @@ fun main(args: Array<String>) {
             println(tgBotService.sendMessage(chatId, helloText))
         if (text.equals("/start", ignoreCase = true) && chatId != null)
             println(tgBotService.sendMenu(chatId))
-        if (data.equals("learn_words_clicked", ignoreCase = true) && chatId != null)
-            println(tgBotService.sendMessage(chatId, "learn_words_clicked"))
-        if (data.equals("statistics_clicked", ignoreCase = true) && chatId != null)
-            println(tgBotService.sendMessage(chatId, "Выучено 10 из 10 слов | 100%"))
+        if (data == TelegramBotService.LEARN_WORDS_CLICKED && chatId != null)
+            println(tgBotService.sendMessage(chatId, TelegramBotService.LEARN_WORDS_CLICKED))
+        if (data == TelegramBotService.STATISTICS_CLICKED && chatId != null) {
+            val statistics = trainer.getStatistics()
+            val message = if (statistics.totalCount != 0)
+                "Выучено ${statistics.learnedCount} из ${statistics.totalCount} слов | ${statistics.percent}%"
+            else
+                "Словарь пустой"
+            println(tgBotService.sendMessage(chatId, message))
+        }
     }
 }
