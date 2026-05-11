@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
     val helloText = "Hello"
     val trainer = try {
         LearnWordsTrainer(minCorrectAnswersCount = 3, answersVariantsCount = 4)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         println()
         println("Невозможно загрузить словарь")
         return
@@ -32,8 +32,9 @@ fun main(args: Array<String>) {
             println(tgBotService.sendMessage(chatId, helloText))
         if (text.equals("/start", ignoreCase = true) && chatId != null)
             println(tgBotService.sendMenu(chatId))
-        if (data == TelegramBotService.LEARN_WORDS_CLICKED && chatId != null)
-            println(tgBotService.sendMessage(chatId, TelegramBotService.LEARN_WORDS_CLICKED))
+        if (data == TelegramBotService.LEARN_WORDS_CLICKED && chatId != null) {
+            checkNextQuestionAndSend(trainer, tgBotService, chatId)
+        }
         if (data == TelegramBotService.STATISTICS_CLICKED && chatId != null) {
             val statistics = trainer.getStatistics()
             val message = if (statistics.totalCount != 0)
@@ -42,5 +43,18 @@ fun main(args: Array<String>) {
                 "Словарь пустой"
             println(tgBotService.sendMessage(chatId, message))
         }
+    }
+}
+
+fun checkNextQuestionAndSend(
+    trainer: LearnWordsTrainer,
+    telegramBotService: TelegramBotService,
+    chatId: Int
+) {
+    val question = trainer.getNextQuestion()
+    if (question != null) {
+        println(telegramBotService.sendQuestion(chatId, question))
+    } else {
+        println(telegramBotService.sendMessage(chatId, "Все слова в словаре выучены"))
     }
 }
