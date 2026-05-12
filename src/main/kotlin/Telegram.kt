@@ -1,4 +1,5 @@
 import org.example.LearnWordsTrainer
+import org.example.Question
 
 fun main(args: Array<String>) {
     val botToken = args[0]
@@ -16,6 +17,7 @@ fun main(args: Array<String>) {
         println("Невозможно загрузить словарь")
         return
     }
+    var question: Question? = null
 
     while (true) {
         Thread.sleep(2000)
@@ -33,7 +35,7 @@ fun main(args: Array<String>) {
         if (text.equals("/start", ignoreCase = true) && chatId != null)
             println(tgBotService.sendMenu(chatId))
         if (data == TelegramBotService.LEARN_WORDS_CLICKED && chatId != null) {
-            checkNextQuestionAndSend(trainer, tgBotService, chatId)
+            question = checkNextQuestionAndSend(trainer, tgBotService, chatId)
         }
         if (data == TelegramBotService.STATISTICS_CLICKED && chatId != null) {
             val statistics = trainer.getStatistics()
@@ -43,6 +45,16 @@ fun main(args: Array<String>) {
                 "Словарь пустой"
             println(tgBotService.sendMessage(chatId, message))
         }
+        if (data?.startsWith(TelegramBotService.CALLBACK_DATA_ANSWER_PREFIX) == true && chatId != null) {
+            val userAnswerIndex = data.substringAfter(TelegramBotService.CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
+            val message = if (trainer.checkAnswer(userAnswerIndex))
+                "Правильно!"
+            else
+                "Неправильно! ${question?.variants[question.correctAnswerId]?.original} – " +
+                        "это ${question?.variants[question.correctAnswerId]?.translate}"
+            println(tgBotService.sendMessage(chatId, message))
+            question = checkNextQuestionAndSend(trainer, tgBotService, chatId)
+        }
     }
 }
 
@@ -50,11 +62,12 @@ fun checkNextQuestionAndSend(
     trainer: LearnWordsTrainer,
     telegramBotService: TelegramBotService,
     chatId: Int
-) {
+): Question? {
     val question = trainer.getNextQuestion()
     if (question != null) {
         println(telegramBotService.sendQuestion(chatId, question))
     } else {
         println(telegramBotService.sendMessage(chatId, "Все слова в словаре выучены"))
     }
+    return question
 }
