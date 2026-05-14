@@ -56,7 +56,7 @@ fun main(args: Array<String>) {
                 if (original != null && translate != null)
                     "Неправильно! $original – это $translate"
                 else
-                    "<нет данных>"
+                    "Нет данных"
             }
             println(tgBotService.sendMessage(chatId, message))
             question = checkNextQuestionAndSend(trainer, tgBotService, chatId)
