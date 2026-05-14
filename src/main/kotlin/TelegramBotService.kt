@@ -70,7 +70,7 @@ class TelegramBotService(
         val answerVariants = question.variants
             .mapIndexed { index: Int, word: Word ->
                 "[{\"text\": \"${word.translate}\"," +
-                  "\"callback_data\": \"${CALLBACK_DATA_ANSWER_PREFIX + index}\"}]"
+                  "\"callback_data\": \"$CALLBACK_DATA_ANSWER_PREFIX$index\"}]"
             }
             .joinToString(",")
         val sendQuestionBody = """

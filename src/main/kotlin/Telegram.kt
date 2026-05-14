@@ -49,9 +49,15 @@ fun main(args: Array<String>) {
             val userAnswerIndex = data.substringAfter(TelegramBotService.CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
             val message = if (trainer.checkAnswer(userAnswerIndex))
                 "Правильно!"
-            else
-                "Неправильно! ${question?.variants[question.correctAnswerId]?.original} – " +
-                        "это ${question?.variants[question.correctAnswerId]?.translate}"
+            else {
+                val questionWord = question?.variants?.getOrNull(question.correctAnswerId)
+                val original = questionWord?.original
+                val translate = questionWord?.translate
+                if (original != null && translate != null)
+                    "Неправильно! $original – это $translate"
+                else
+                    "<нет данных>"
+            }
             println(tgBotService.sendMessage(chatId, message))
             question = checkNextQuestionAndSend(trainer, tgBotService, chatId)
         }
