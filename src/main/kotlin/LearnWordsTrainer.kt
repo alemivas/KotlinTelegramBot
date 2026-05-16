@@ -17,6 +17,7 @@ data class Statistics(
 data class Question(
     val variants: List<Word>,
     val correctAnswerId: Int,
+    val correctAnswer: Word,
     val variantsRange: IntRange,
 )
 
@@ -57,6 +58,7 @@ class LearnWordsTrainer(
         question = Question(
             variants = questionWords,
             correctAnswerId = correctAnswerId,
+            correctAnswer = questionWords[correctAnswerId],
             variantsRange = answersVariantsRange,
         )
         return question

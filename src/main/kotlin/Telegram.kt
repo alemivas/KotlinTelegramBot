@@ -16,7 +16,6 @@ fun main(args: Array<String>) {
         println("Невозможно загрузить словарь")
         return
     }
-//    var question: Question? = null
 
     while (true) {
         Thread.sleep(2000)
@@ -34,7 +33,6 @@ fun main(args: Array<String>) {
         if (text.equals("/start", ignoreCase = true) && chatId != null)
             println(tgBotService.sendMenu(chatId))
         if (data == TelegramBotService.LEARN_WORDS_CLICKED && chatId != null) {
-//            question = checkNextQuestionAndSend(trainer, tgBotService, chatId)
             checkNextQuestionAndSend(trainer, tgBotService, chatId)
         }
         if (data == TelegramBotService.STATISTICS_CLICKED && chatId != null) {
@@ -50,19 +48,14 @@ fun main(args: Array<String>) {
             val message = if (trainer.checkAnswer(userAnswerIndex))
                 "Правильно!"
             else {
-//                val questionWord = question?.variants?.getOrNull(question.correctAnswerId)
-//                val questionWord = trainer.question?.variants?.getOrNull(trainer.question?.correctAnswerId)
-                val questionWord =
-                    trainer.question?.let { question -> question.variants.getOrNull(question.correctAnswerId) }
-                val original = questionWord?.original
-                val translate = questionWord?.translate
+                val original = trainer.question?.correctAnswer?.original
+                val translate = trainer.question?.correctAnswer?.translate
                 if (original != null && translate != null)
                     "Неправильно! $original – это $translate"
                 else
                     "Нет данных"
             }
             println(tgBotService.sendMessage(chatId, message))
-//            question = checkNextQuestionAndSend(trainer, tgBotService, chatId)
             checkNextQuestionAndSend(trainer, tgBotService, chatId)
         }
     }
@@ -72,12 +65,11 @@ fun checkNextQuestionAndSend(
     trainer: LearnWordsTrainer,
     telegramBotService: TelegramBotService,
     chatId: Int
-)/*: Question?*/ {
+) {
     val question = trainer.getNextQuestion()
     if (question != null) {
         println(telegramBotService.sendQuestion(chatId, question))
     } else {
         println(telegramBotService.sendMessage(chatId, "Все слова в словаре выучены"))
     }
-//    return question
 }
