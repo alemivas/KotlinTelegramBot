@@ -1,12 +1,49 @@
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.example.LearnWordsTrainer
+
+@Serializable
+data class Update(
+    @SerialName("update_id")
+    val updateId: Long,
+    @SerialName("message")
+    val message: Message? = null,
+    @SerialName("callback_query")
+    val callbackQuery: CallbackQuery? = null,
+)
+
+@Serializable
+data class Response(
+    @SerialName("result")
+    val result: List<Update>
+)
+
+@Serializable
+data class Message(
+    @SerialName("text")
+    val text: String
+)
+
+@Serializable
+data class CallbackQuery(
+    @SerialName("data")
+    val data: String
+)
 
 fun main(args: Array<String>) {
     val botToken = args[0]
     var updateId = 0
-    val updateIdRegex: Regex = "\"update_id\":([0-9]+?),".toRegex()
-    val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
-    val chatIdRegex: Regex = "\"chat\":\\{\"id\":([0-9]+?),".toRegex()
-    val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
+//    val updateIdRegex: Regex = "\"update_id\":([0-9]+?),".toRegex()
+//    val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
+//    val chatIdRegex: Regex = "\"chat\":\\{\"id\":([0-9]+?),".toRegex()
+//    val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
+
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
+
+
     val tgBotService = TelegramBotService(botToken)
     val helloText = "Hello"
     val trainer = try {
