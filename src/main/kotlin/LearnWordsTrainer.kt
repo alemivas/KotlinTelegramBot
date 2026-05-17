@@ -17,6 +17,7 @@ data class Statistics(
 data class Question(
     val variants: List<Word>,
     val correctAnswerId: Int,
+    val correctAnswer: Word,
     val variantsRange: IntRange,
 )
 
@@ -25,7 +26,7 @@ class LearnWordsTrainer(
     private val answersVariantsCount: Int = 4
 ) {
     private val wordsFile = File("words.txt")
-    private var question: Question? = null
+    var question: Question? = null
     private val dictionary = loadDictionary()
 
     fun getStatistics(): Statistics {
@@ -57,6 +58,7 @@ class LearnWordsTrainer(
         question = Question(
             variants = questionWords,
             correctAnswerId = correctAnswerId,
+            correctAnswer = questionWords[correctAnswerId],
             variantsRange = answersVariantsRange,
         )
         return question

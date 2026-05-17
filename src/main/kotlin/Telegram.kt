@@ -43,6 +43,21 @@ fun main(args: Array<String>) {
                 "Словарь пустой"
             println(tgBotService.sendMessage(chatId, message))
         }
+        if (data?.startsWith(TelegramBotService.CALLBACK_DATA_ANSWER_PREFIX) == true && chatId != null) {
+            val userAnswerIndex = data.substringAfter(TelegramBotService.CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
+            val message = if (trainer.checkAnswer(userAnswerIndex))
+                "Правильно!"
+            else {
+                val original = trainer.question?.correctAnswer?.original
+                val translate = trainer.question?.correctAnswer?.translate
+                if (original != null && translate != null)
+                    "Неправильно! $original – это $translate"
+                else
+                    "Нет данных"
+            }
+            println(tgBotService.sendMessage(chatId, message))
+            checkNextQuestionAndSend(trainer, tgBotService, chatId)
+        }
     }
 }
 

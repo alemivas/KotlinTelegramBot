@@ -12,7 +12,7 @@ class TelegramBotService(
     companion object {
         const val LEARN_WORDS_CLICKED = "learn_words_clicked"
         const val STATISTICS_CLICKED = "statistics_clicked"
-        private const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
+        const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
     }
 
     private val baseURL = "https://api.telegram.org/bot$botToken/"
@@ -70,7 +70,7 @@ class TelegramBotService(
         val answerVariants = question.variants
             .mapIndexed { index: Int, word: Word ->
                 "[{\"text\": \"${word.translate}\"," +
-                        "\"callback_data\": \"${CALLBACK_DATA_ANSWER_PREFIX + index}\"}]"
+                  "\"callback_data\": \"$CALLBACK_DATA_ANSWER_PREFIX$index\"}]"
             }
             .joinToString(",")
         val sendQuestionBody = """
